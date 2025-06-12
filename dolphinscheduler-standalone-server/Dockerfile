@@ -27,7 +27,7 @@ RUN apt update ; \
 
 WORKDIR $DOLPHINSCHEDULER_HOME
 
-ADD ../../../target/standalone-server $DOLPHINSCHEDULER_HOME
+ADD ./target/standalone-server $DOLPHINSCHEDULER_HOME
 
 EXPOSE 12345 25333
 

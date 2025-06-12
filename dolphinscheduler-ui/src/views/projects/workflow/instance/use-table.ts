@@ -102,7 +102,8 @@ export function useTable() {
                   params: { id: row.id },
                   query: { code: row.processDefinitionCode }
                 })
-                window.open(routeUrl.href, '_blank')
+                router.push(routeUrl.href)
+                // window.open(routeUrl.href, '_self')
               }
             },
             {

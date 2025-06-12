@@ -110,7 +110,8 @@ export function useTable() {
                   params: { id: row.processInstanceId },
                   query: { code: projectCode }
                 })
-                window.open(routeUrl.href, '_blank')
+                router.push(routeUrl.href)
+                // window.open(routeUrl.href, '_self')
               }
             },
             {

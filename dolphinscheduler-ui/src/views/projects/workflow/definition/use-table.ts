@@ -108,7 +108,8 @@ export function useTable() {
                         name: 'workflow-definition-detail',
                         params: { code: row.code }
                       })
-                      window.open(routeUrl.href, '_blank')
+                      router.push(routeUrl.href)
+                      // window.open(routeUrl.href, '_self')
                     }
                   },
                   {

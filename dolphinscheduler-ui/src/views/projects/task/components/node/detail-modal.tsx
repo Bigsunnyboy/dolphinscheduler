@@ -148,7 +148,13 @@ const NodeDetailModal = defineComponent({
               '/docs/latest/user_doc/guide/task/' +
               linkedTaskType +
               '.html'
-            window.open(helpUrl)
+            router.push({
+              name: 'external',
+              query: {
+                url: helpUrl
+              }
+            })
+            // window.open(helpUrl, '_self')
           },
           icon: renderIcon(QuestionCircleTwotone)
         },

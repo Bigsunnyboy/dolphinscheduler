@@ -14,65 +14,65 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-version: "3.8"
+#version: "3.8"
 
 services:
-  dolphinscheduler-postgresql:
-    image: bitnami/postgresql:15.2.0
+  ds-mysql:
+    image: bitnami/mysql:8.3.0
     ports:
-      - "5432:5432"
-    profiles: ["all", "schema"]
+      - "3306:3306"
+    profiles: [ "all", "schema" ]
     environment:
-      POSTGRESQL_USERNAME: root
-      POSTGRESQL_PASSWORD: root
-      POSTGRESQL_DATABASE: dolphinscheduler
+      MYSQL_USERNAME: root
+      MYSQL_PASSWORD: root
+      MYSQL_DATABASE: dolphinscheduler
     volumes:
-      - dolphinscheduler-postgresql:/bitnami/postgresql
+      - ~/data/docker/dolphinscheduler/ds-mysql:/bitnami/mysql
     healthcheck:
-      test: ["CMD", "bash", "-c", "cat < /dev/null > /dev/tcp/127.0.0.1/5432"]
+      test: [ "CMD", "bash", "-c", "cat < /dev/null > /dev/tcp/127.0.0.1/3306" ]
       interval: 5s
       timeout: 60s
       retries: 120
     networks:
-      - dolphinscheduler
+      - ds
 
-  dolphinscheduler-zookeeper:
-    image: bitnami/zookeeper:3.7.1
-    profiles: ["all"]
+  ds-zookeeper:
+    image: bitnami/zookeeper:3.8.4
+    profiles: [ "all" ]
     environment:
       ALLOW_ANONYMOUS_LOGIN: "yes"
       ZOO_4LW_COMMANDS_WHITELIST: srvr,ruok,wchs,cons
     volumes:
-      - dolphinscheduler-zookeeper:/bitnami/zookeeper
+      - ~/data/docker/dolphinscheduler/ds-zookeeper:/bitnami/zookeeper
     healthcheck:
-      test: ["CMD", "bash", "-c", "cat < /dev/null > /dev/tcp/127.0.0.1/2181"]
+      test: [ "CMD", "bash", "-c", "cat < /dev/null > /dev/tcp/127.0.0.1/2181" ]
       interval: 5s
       timeout: 60s
       retries: 120
     networks:
-      - dolphinscheduler
+      - ds
 
-  dolphinscheduler-schema-initializer:
+  ds-schema-initializer:
     image: ${HUB}/dolphinscheduler-tools:${TAG}
     env_file: .env
-    profiles: ["schema"]
+    profiles: [ "schema" ]
     command: [ tools/bin/upgrade-schema.sh ]
     depends_on:
-      dolphinscheduler-postgresql:
+      ds-mysql:
         condition: service_healthy
     volumes:
-      - dolphinscheduler-logs:/opt/dolphinscheduler/logs
-      - dolphinscheduler-shared-local:/opt/soft
-      - dolphinscheduler-resource-local:/dolphinscheduler
+      - ~/data/docker/dolphinscheduler/ds-logs:/opt/dolphinscheduler/logs
+      - ~/data/docker/dolphinscheduler/ds-shared-local:/opt/soft
+      - ~/data/docker/dolphinscheduler/ds-resource-local:/dolphinscheduler
     networks:
-      - dolphinscheduler
+      - ds
 
-  dolphinscheduler-api:
+  ds-api:
     image: ${HUB}/dolphinscheduler-api:${TAG}
     ports:
       - "12345:12345"
       - "25333:25333"
-    profiles: ["all"]
+    profiles: [ "all" ]
     env_file: .env
     healthcheck:
       test: [ "CMD", "curl", "http://localhost:12345/dolphinscheduler/actuator/health" ]
@@ -80,18 +80,18 @@ services:
       timeout: 5s
       retries: 3
     depends_on:
-      dolphinscheduler-zookeeper:
+      ds-zookeeper:
         condition: service_healthy
     volumes:
-      - dolphinscheduler-logs:/opt/dolphinscheduler/logs
-      - dolphinscheduler-shared-local:/opt/soft
-      - dolphinscheduler-resource-local:/dolphinscheduler
+      - ~/data/docker/dolphinscheduler/ds-logs:/opt/dolphinscheduler/logs
+      - ~/data/docker/dolphinscheduler/ds-shared-local:/opt/soft
+      - ~/data/docker/dolphinscheduler/ds-resource-local:/dolphinscheduler
     networks:
-      - dolphinscheduler
+      - ds
 
-  dolphinscheduler-alert:
+  ds-alert:
     image: ${HUB}/dolphinscheduler-alert-server:${TAG}
-    profiles: ["all"]
+    profiles: [ "all" ]
     env_file: .env
     healthcheck:
       test: [ "CMD", "curl", "http://localhost:50053/actuator/health" ]
@@ -99,16 +99,16 @@ services:
       timeout: 5s
       retries: 3
     depends_on:
-      dolphinscheduler-zookeeper:
+      ds-zookeeper:
         condition: service_healthy
     volumes:
-      - dolphinscheduler-logs:/opt/dolphinscheduler/logs
+      - ~/data/docker/dolphinscheduler/ds-logs:/opt/dolphinscheduler/logs
     networks:
-      - dolphinscheduler
+      - ds
 
-  dolphinscheduler-master:
+  ds-master:
     image: ${HUB}/dolphinscheduler-master:${TAG}
-    profiles: ["all"]
+    profiles: [ "all" ]
     env_file: .env
     healthcheck:
       test: [ "CMD", "curl", "http://localhost:5679/actuator/health" ]
@@ -116,17 +116,17 @@ services:
       timeout: 5s
       retries: 3
     depends_on:
-      dolphinscheduler-zookeeper:
+      ds-zookeeper:
         condition: service_healthy
     volumes:
-      - dolphinscheduler-logs:/opt/dolphinscheduler/logs
-      - dolphinscheduler-shared-local:/opt/soft
+      - ~/data/docker/dolphinscheduler/ds-logs:/opt/dolphinscheduler/logs
+      - ~/data/docker/dolphinscheduler/ds-shared-local:/opt/soft
     networks:
-      - dolphinscheduler
+      - ds
 
-  dolphinscheduler-worker:
+  ds-worker:
     image: ${HUB}/dolphinscheduler-worker:${TAG}
-    profiles: ["all"]
+    profiles: [ "all" ]
     env_file: .env
     healthcheck:
       test: [ "CMD", "curl", "http://localhost:1235/actuator/health" ]
@@ -134,24 +134,24 @@ services:
       timeout: 5s
       retries: 3
     depends_on:
-      dolphinscheduler-zookeeper:
+      ds-zookeeper:
         condition: service_healthy
     volumes:
-      - dolphinscheduler-worker-data:/tmp/dolphinscheduler
-      - dolphinscheduler-logs:/opt/dolphinscheduler/logs
-      - dolphinscheduler-shared-local:/opt/soft
-      - dolphinscheduler-resource-local:/dolphinscheduler
+      - ~/data/docker/dolphinscheduler/ds-worker-data:/tmp/dolphinscheduler
+      - ~/data/docker/dolphinscheduler/ds-logs:/opt/dolphinscheduler/logs
+      - ~/data/docker/dolphinscheduler/ds-shared-local:/opt/soft
+      - ~/data/docker/dolphinscheduler/ds-resource-local:/dolphinscheduler
     networks:
-      - dolphinscheduler
+      - ds
 
 networks:
-  dolphinscheduler:
+  ds:
     driver: bridge
 
 volumes:
-  dolphinscheduler-postgresql:
-  dolphinscheduler-zookeeper:
-  dolphinscheduler-worker-data:
-  dolphinscheduler-logs:
-  dolphinscheduler-shared-local:
-  dolphinscheduler-resource-local:
+  ds-mysql:
+  ds-zookeeper:
+  ds-worker-data:
+  ds-logs:
+  ds-shared-local:
+  ds-resource-local:

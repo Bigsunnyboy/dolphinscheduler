@@ -39,7 +39,7 @@ spring:
       schema-locations: classpath:sql/dolphinscheduler_mysql.sql
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/dolphinscheduler?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
+    url: jdbc:mysql://192.168.10.134:3306/dolphinscheduler?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
     username: root
     password: Lzx961228
   quartz:
@@ -126,7 +126,7 @@ security:
           clientSecret: ""
           tokenUri: "https://github.com/login/oauth/access_token"
           userInfoUri: "https://api.github.com/user"
-          callbackUrl: "http://localhost:5173/login"
+          callbackUrl: "http://localhost:12345/login"
           iconUri: ""
           provider: github
         gitee:
@@ -136,7 +136,7 @@ security:
           clientSecret: ""
           tokenUri: "https://gitee.com/oauth/token?grant_type=authorization_code"
           userInfoUri: "https://gitee.com/api/v5/user"
-          callbackUrl: "http://127.0.0.1:5173/login"
+          callbackUrl: "http://127.0.0.1:12345/login"
           iconUri: ""
           provider: gitee
 
@@ -152,7 +152,7 @@ casdoor:
   # Your application name added in Casdoor
   application-name: dolphinscheduler
   # Doplhinscheduler login url
-  redirect-url: http://localhost:5173/login
+  redirect-url: http://localhost:12345/login
 
 
 
@@ -232,7 +232,7 @@ api:
     # when you deploy in public network.
     auth-token: jwUDzpLsNKEFER4*a8gruBH_GsAurNxU7A@Xc
     # The address of Python gateway server start. Set its value to `0.0.0.0` if your Python API run in different
-    # between Python gateway server. It could be be specific to other address like `127.0.0.1` or `localhost`
+    # between Python gateway server. It could be be specific to other address like `127.0.0.1` or `192.168.10.134`
     gateway-server-address: 0.0.0.0
     # The port of Python gateway server start. Define which port you could connect to Python gateway server from
     # Python API side.
@@ -250,6 +250,7 @@ api:
 
 server:
   port: 12345
+  address: 0.0.0.0
   servlet:
     session:
       timeout: 120m
@@ -306,6 +307,6 @@ spring:
        schema-locations: classpath:sql/dolphinscheduler_mysql.sql
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/dolphinscheduler?useUnicode=true&characterEncoding=UTF-8
+    url: jdbc:mysql://192.168.10.134:3306/dolphinscheduler?useUnicode=true&characterEncoding=UTF-8
     username: root
     password: Lzx961228

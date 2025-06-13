@@ -19,15 +19,28 @@ FROM eclipse-temurin:8-jre
 
 ENV DOCKER true
 ENV TZ Asia/Shanghai
-ENV DOLPHINSCHEDULER_HOME /home/lzx/software/dolphinscheduler
+ENV DOLPHINSCHEDULER_HOME /opt/dolphinscheduler
 
 RUN apt update ; \
     apt install -y sudo ; \
     rm -rf /var/lib/apt/lists/*
 
+# 安装python3环境
+RUN sudo apt-get update && \
+    apt-get install -y --no-install-recommends curl && \
+    rm -rf /var/lib/apt/lists/*
+
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends python3 && \
+    rm -rf /var/lib/apt/lists/*
+
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends python3-pip && \
+    rm -rf /var/lib/apt/lists/*
+
 WORKDIR $DOLPHINSCHEDULER_HOME
 
-ADD ../../../target/standalone-server $DOLPHINSCHEDULER_HOME
+COPY ../../../target/standalone-server $DOLPHINSCHEDULER_HOME
 
 EXPOSE 12345 25333
 
